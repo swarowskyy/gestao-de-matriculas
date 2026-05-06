@@ -1,45 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Aluno } from './entities/aluno.entity';
 
 @Injectable()
 export class AlunoService {
-  // Correção 1: 'alunos' precisa ser uma lista (Array) para guardar mais de um!
+  // Lista que simula o nosso banco de dados
   private alunos: Aluno[] = [];
 
-  // Correção 2: Agora ele recebe o objeto 'dados' inteirinho, igual o Controller envia
   create(dados: { codigo_matricula: string; nome_completo: string; situacao: string }) {
     const novoAluno = new Aluno();
-    
-    // Correção 3: Atribuindo cada valor ao seu respectivo lugar (antes repetia codigo_matricula)
     novoAluno.codigo_matricula = dados.codigo_matricula;
     novoAluno.nome_completo = dados.nome_completo;
     novoAluno.situacao = dados.situacao;
 
-    // Correção 4: Salvando o aluno na nossa "base de dados" (o Array)
     this.alunos.push(novoAluno);
-
-    return 'This action adds a new aluno';
+    return novoAluno; // Retorna o aluno que acabou de ser criado
   }
 
   findAll() {
-    return this.alunos;
+    return this.alunos; // Retorna a lista de todos os alunos
   }
 
   findOne(codigo_matricula: string) {
-    return `This action returns a #${codigo_matricula} aluno`;
+    const aluno = this.alunos.find(a => a.codigo_matricula === codigo_matricula);
+    
+    if (!aluno) {
+      throw new NotFoundException(`Aluno com matrícula ${codigo_matricula} não encontrado.`);
+    }
+    
+    return aluno; // Retorna os dados do aluno encontrado
   }
 
-  // Correção 5: Faltava dizer que codigo_matricula era uma string aqui
   update(codigo_matricula: string, dados: Partial<Aluno>) {
     const index = this.alunos.findIndex(aluno => aluno.codigo_matricula === codigo_matricula);
-    if (index >= 0) {
-      this.alunos[index] = { ...this.alunos[index], ...dados };
-      return `A matricula deste aluno #${codigo_matricula} foi atualizada com sucesso.`;
+    
+    if (index < 0) {
+      throw new NotFoundException(`Não foi possível atualizar: matrícula ${codigo_matricula} não encontrada.`);
     }
-    return `A matricula do aluno #${codigo_matricula} não foi encontrada.`;
+
+    // Mescla os dados antigos com os novos
+    this.alunos[index] = { ...this.alunos[index], ...dados };
+    
+    return this.alunos[index]; // Retorna o aluno já com os dados atualizados
   }
 
   remove(codigo_matricula: string) {
-    return `This action removes a #${codigo_matricula} aluno`;
+    const index = this.alunos.findIndex(aluno => aluno.codigo_matricula === codigo_matricula);
+    
+    if (index < 0) {
+      throw new NotFoundException(`Não foi possível remover: matrícula ${codigo_matricula} não encontrada.`);
+    }
+
+    // Remove o aluno da lista
+    this.alunos.splice(index, 1);
+    
+    return { mensagem: `O aluno da matrícula ${codigo_matricula} foi removido com sucesso.` };
   }
 }

@@ -8,7 +8,6 @@ export class AlunoController {
 
   @Post()
   create(@Body() dados: { codigo_matricula: string; nome_completo: string; situacao: string; }) {
-    // Agora o Service está preparado para receber este objeto!
     return this.alunoService.create(dados);
   }
 

@@ -4,6 +4,6 @@ export class Aluno {
     situacao:string;
     acompanhamento:string;
     constructor(){
-        this.acompanhamento="cursando";
+        this.situacao="cursando";
     }
 }

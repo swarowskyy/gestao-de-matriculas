@@ -1,7 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AlunoService } from './aluno.service';
-import { CreateAlunoDto } from './dto/create-aluno.dto';
-import { UpdateAlunoDto } from './dto/update-aluno.dto';
 import { Aluno } from './entities/aluno.entity';
 
 @Controller('alunos')
@@ -9,8 +7,9 @@ export class AlunoController {
   constructor(private readonly alunoService: AlunoService) {}
 
   @Post()
-  create(@Body() dados:{ codigo_matricula:string; nome_completo:string; situacao:string;}) {
-    return this.alunoService.create(dados.codigo_matricula,dados);
+  create(@Body() dados: { codigo_matricula: string; nome_completo: string; situacao: string; }) {
+    // Agora o Service está preparado para receber este objeto!
+    return this.alunoService.create(dados);
   }
 
   @Get()
@@ -18,18 +17,18 @@ export class AlunoController {
     return this.alunoService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') ) {
-    return this.alunoService.findOne();
+  @Get(':codigo_matricula')
+  findOne(@Param('codigo_matricula') codigo_matricula: string) {
+    return this.alunoService.findOne(codigo_matricula);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() dados:Partial<Aluno>) {
-    return this.alunoService.update(+id, dados);
+  @Patch(':codigo_matricula')
+  update(@Param('codigo_matricula') codigo_matricula: string, @Body() dados: Partial<Aluno>) {
+    return this.alunoService.update(codigo_matricula, dados);
   }
 
-  @Delete('id')
-  remove(@Param('id') id: string) {
-    return this.alunoService.remove(+id);
+  @Delete(':codigo_matricula')
+  remove(@Param('codigo_matricula') codigo_matricula: string) {
+    return this.alunoService.remove(codigo_matricula);
   }
 }
